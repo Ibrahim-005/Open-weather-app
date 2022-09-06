@@ -160,7 +160,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         if isSearching {
             let cell = tableView.dequeueReusableCell(withIdentifier: "cell")! as UITableViewCell
             if resultArr.count == 0 {
-                cell.textLabel?.text = "After typing click Cancel.."
+                cell.textLabel?.text = "After typing click Cancel."
                 cell.selectionStyle = .none
                 return cell
             }
