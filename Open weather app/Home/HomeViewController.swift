@@ -259,11 +259,12 @@ extension HomeViewController: UISearchBarDelegate {
         getWeather(city: searchText) { [self] weather , _  in
             
             DispatchQueue.main.async {
-                self.fullWeather = weather
                 
                 if weather.timezone == "Etc/GMT" {
                     self.cityName = "Unknown!"
+                    self.fullWeather = nil
                 } else{
+                    self.fullWeather = weather
                     self.cityName = searchBarText
                 }
                 
