@@ -160,7 +160,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         if isSearching {
             let cell = tableView.dequeueReusableCell(withIdentifier: "cell")! as UITableViewCell
             if resultArr.count == 0 {
-                cell.textLabel?.text = "After typing click Cancel."
+                cell.textLabel?.text = "Search cities..."
                 cell.selectionStyle = .none
                 return cell
             }
@@ -210,20 +210,6 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
             controller.fullWeather = self.fullWeather
             controller.title = cityName
         }
-//        if isSearching && resultArr.count > 0{
-//            searchBar.text = resultArr[indexPath.row].name
-//            isSearching = false
-//            lon = resultArr[indexPath.row].coord?.lon ?? 0.0
-//            lat = resultArr[indexPath.row].coord?.lat ?? 0.0
-//            cityName = resultArr[indexPath.row].name ?? ""
-//            weatherManager.fetchWeather(lat: lat, long: lon) { w in
-//               // self.fullWeather = w
-//            }
-//            searchBar.showsCancelButton = isSearching
-//            navigationItem.titleView = isSearching ? searchBar : nil
-//            showSearchBarButton(shouldShow: !isSearching)
-//            searchBar.text = ""
-//        }
         tableview.reloadData()
     }
 }
@@ -253,24 +239,34 @@ extension HomeViewController: UISearchBarDelegate {
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         search(shouldShow: false)
-        tableview.reloadData()
         searchBar.text = ""
-        // Start fetching data with cancel button
-        getCity(searchText: searchBarText)
     }
     
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBarText = searchBar.text!
-        self.cityName = searchBarText
+        // Start fetching data
+        getCity(searchText: searchBarText)
         
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.search(shouldShow: false)
+            searchBar.text = ""
+        }
         tableview.reloadData()
     }
+
     
     func getCity(searchText: String){
         getWeather(city: searchText) { [self] weather , _  in
+            
             DispatchQueue.main.async {
                 self.fullWeather = weather
+                
+                if weather.timezone == "Etc/GMT" {
+                    self.cityName = "Unknown!"
+                } else{
+                    self.cityName = searchBarText
+                }
+                
                 tableview.reloadData()
             }
         }
